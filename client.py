@@ -1,3 +1,8 @@
+# Laboratory Exercise 5
+# Hannah Bella Arceño
+# Karmela Castro
+# BS Computer Science IV
+
 import socket
 import random
 from threading import Thread
@@ -5,7 +10,7 @@ from datetime import datetime
 from colorama import Fore, init, Back
 import sys
 
-# init colors
+# initialize colors
 init()
 
 # set the available colors
@@ -32,14 +37,18 @@ print(f"[*] Connecting to {SERVER_HOST}:{SERVER_PORT}...")
 s.connect((SERVER_HOST, SERVER_PORT))
 print("[+] Connected.")
 
+# display the commands to the client
+# the commands will help the user solve for their public and secret key
 print("""
     Commands:
         sendmypublickey - compute public key and send to other client.
         getsecretkey    - get public key of other client and compute secret key.
         quit             - exit
     """)
-# prompt the client for a name
+
+# ask the client for a name
 name = input("Enter your name: ")
+# ask the client for a private key
 priv_key = int(input("Enter your private key: "))
 
 def listen_for_messages():
@@ -54,30 +63,17 @@ t.daemon = True
 # start the thread
 t.start()
 
+# define the P and G values
 P = 11
 G = 7
-#Alice_priv_key = 3
-#Bob_priv_key = 5
 
-#def get_key(name):
+# get the public key of the client and send it
 def get_key(priv_key):
     return int(pow(G,priv_key,P))
-    #if name.lower() == "alice":
-        #alice_pub = int(pow(G,Alice_priv_key,P))
-        #return alice_pub
-    #elif name.lower() == "bob":
-        #bob_pub = int(pow(G,Bob_priv_key,P))
-        #return bob_pub
 
+# get the private key of the client and send it
 def get_secret(priv_key, x):
     return int((x**priv_key)%P)
-    #if name.lower() == "alice":
-        #alice_ka = int((x**Alice_priv_key)%P)
-        #return alice_ka
-    #elif name.lower() == "bob":
-        #bob_ka = int((x**Bob_priv_key)%P)
-        #return bob_ka
-
 
 while True:
     # input message we want to send to the server
@@ -85,14 +81,20 @@ while True:
     # a way to exit the program
     if to_send.lower() == 'quit':
         break
-
+        
+    # solve and send the public key to other client
     elif to_send.lower() == 'sendmypublickey':
         to_send = get_key(priv_key)
 
+    # solve and send your private key
     elif to_send.lower() == 'getsecretkey':
+        # ask the user for their public key
         x = int(input("Enter public key of other: "))
-
+        
+        # solve and get secret key
         secret_key = get_secret(priv_key, x)
+        
+        # display the secret key to client
         print("Secret key: ", secret_key)
 
         sys.exit() # quit program since secret key computed
