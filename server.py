@@ -14,14 +14,17 @@ separator_token = "<SEP>" # we will use this to separate the client name & messa
 
 print("Hi! I'm Eve. I'm the channel for exchanging keys!\n")
 
-# initialize list/set of all connected client's sockets
-client_sockets = set()
+client_sockets = set() # list/set of all connected client's sockets
+
 # create a TCP socket
 s = socket.socket()
+
 # make the port as reusable port
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
 # bind the socket to the address we specified
 s.bind((SERVER_HOST, SERVER_PORT))
+
 # listen for upcoming connections
 s.listen(5)
 print(f"[*] Listening as {SERVER_HOST}:{SERVER_PORT}")
@@ -33,10 +36,11 @@ def listen_for_client(cs):
     """
     while True:
         try:
-            # keep listening for a message from `cs` socket
+            # keep listening for message from `cs` socket
             msg = cs.recv(1024).decode()
+
         except Exception as e:
-            # client no longer connected
+            # If client no longer connected
             # remove it from the set
             print(f"[!] Error: {e}") 
             client_sockets.remove(cs)
@@ -45,13 +49,12 @@ def listen_for_client(cs):
                 return 
             
         else:
-            # if we received a message, replace the <SEP> 
-            # token with ": " for nice printing
+            # if we received a message, replace <SEP> 
+            # with ": " when printing
             msg = msg.replace(separator_token, ": ")
 
-        # iterate over all connected sockets
+        # send message to connected clients
         for client_socket in client_sockets:
-            # and send the message
             client_socket.send(msg.encode())
 
 
@@ -59,17 +62,19 @@ while True:
     # we keep listening for new connections all the time
     client_socket, client_address = s.accept()
     print(f"[+] {client_address} connected.")
-    # add the new connected client to connected sockets
-    client_sockets.add(client_socket)
-    # start a new thread that listens for each client's messages
+   
+    client_sockets.add(client_socket)    # add the new connected client to connected sockets
+    
+    # start a new thread that listens for each client messages
     t = Thread(target=listen_for_client, args=(client_socket,))
-    # make the thread daemon so it ends whenever the main thread ends
-    t.daemon = True
-    # start the thread
-    t.start()
+    
+    t.daemon = True # make the thread daemon so it ends whenever the main thread ends
+    
+    t.start() # start thread
 
 # close client sockets
 for cs in client_sockets:
     cs.close()
+
 # close server socket
 s.close()
