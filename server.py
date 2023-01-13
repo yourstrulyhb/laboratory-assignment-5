@@ -1,3 +1,8 @@
+# Laboratory Exercise 5
+# Hannah Bella Arceño
+# Karmela Castro
+# BS Computer Science IV
+
 import socket
 from threading import Thread
 import sys 
