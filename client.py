@@ -64,12 +64,14 @@ t.daemon = True
 t.start()
 
 # define the P and G values
+# P = public modulo
+# G = public prime
 P = 11
 G = 7
 
 # get the public key of the client and send it
 def get_key(priv_key):
-    return int(pow(G,priv_key,P))
+    return int(G**priv_key)%P))
 
 # get the private key of the client and send it
 def get_secret(priv_key, x):
@@ -86,14 +88,12 @@ while True:
     elif to_send.lower() == 'sendmypublickey':
         to_send = get_key(priv_key)
 
-    # solve and send your private key
+    # solve your secret key
     elif to_send.lower() == 'getsecretkey':
         # ask the user for their public key
-        x = int(input("Enter public key of other: "))
-        
-        # solve and get secret key
+        x = int(input("Enter public key of other client: "))
+        # solve using get_secret function
         secret_key = get_secret(priv_key, x)
-        
         # display the secret key to client
         print("Secret key: ", secret_key)
 
